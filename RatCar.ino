@@ -34,6 +34,11 @@
 // once every loopTime will result in a change of ACCELERATION in the commanded speed, so a shorter loopTime will increase the speed at which the car accelerates and decelerates, as will
 // an increase ACCELERATION value.
 
+// This version of the code performs rotation movements (when one of the L/R direction controls is activated without forward motion being commanded) with an overall slight backwards motion,
+// to facilitate the rats turning/reversing away from an obstacle that they have driven up against preventing an on-the-spot rotation. The movestate 3 and movestate 5 code can be seen to still
+// command a forward movement of the wheels on the side of the car opposite the rotation direction, but since it is slower than the backward motion of the wheels on the side of the rotation
+// direction the overall effect is a slightly backwards motion during the rotation which is sufficient to move away from even an obstacle touching the front of the car.
+
 // Paul Bryden-Bradley
 
 
@@ -60,7 +65,7 @@ int MAXSPEED_LEFTWHEELS_ROTATION = 100;     // Maximum speed of left wheels duri
 int MAXSPEED_RIGHTWHEELS_ROTATION = 100;     // Maximum speed of right wheels during rotation, PWM min-max = 0-255
 
 // Obstacle avoidance 
-#define OBSTACLE_AVOIDANCE_DISTANCE 30 // Distance to an obstacle (in centimeters) below which we initiate obstacle avoidance measures
+#define OBSTACLE_AVOIDANCE_DISTANCE 20 // Distance to an obstacle (in centimeters) below which we initiate obstacle avoidance measures
                                        // If we are closer to an obstacle than this distance, only rotating motion is allowed
 
 // Time between control loop iterations
@@ -258,7 +263,7 @@ void setTarget(int)
    case 3:
       //Serial.println("moveState 3 (rotate left) activated in function setTarget");
       TARGETSPEED_LEFTWHEELS = MAXSPEED_LEFTWHEELS_ROTATION * -1;
-      TARGETSPEED_RIGHTWHEELS = MAXSPEED_RIGHTWHEELS_ROTATION;
+      TARGETSPEED_RIGHTWHEELS = MAXSPEED_RIGHTWHEELS_ROTATION * 0.5;
       break;
 
    case 4:
@@ -269,7 +274,7 @@ void setTarget(int)
 
    case 5:
       //Serial.println("moveState 5 (rotate right) activated in function setTarget");
-      TARGETSPEED_LEFTWHEELS = MAXSPEED_LEFTWHEELS_ROTATION;
+      TARGETSPEED_LEFTWHEELS = MAXSPEED_LEFTWHEELS_ROTATION * 0.5;
       TARGETSPEED_RIGHTWHEELS = MAXSPEED_RIGHTWHEELS_ROTATION * -1;
       break;
   }
